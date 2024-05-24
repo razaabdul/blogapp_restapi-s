@@ -41,15 +41,15 @@ class loginserializer(serializers.Serializer):
         if not user.check_password(password):
             raise serializers.ValidationError("Incorrect password")
         refresh=RefreshToken.for_user(user)
-        # print(refresh)
         acces_token=str(refresh.access_token)
-        # print(acces_token)
-        expires_in_timestamp = refresh.access_token.payload["exp"]
+        print('----------------------------',refresh)
+        # expires_in_timestamp = refresh.access_token.payload["exp"]
         # expires_in_datetime = datetime.fromtimestamp(expires_in_timestamp)
         # expires_in_seconds = int((expires_in_datetime - datetime.now()).total_seconds())
         return {
             "user": user.id,
             "access_token": acces_token,
+            "refresh":str(refresh),
             # "expires_in": expires_in_seconds,
             # 'type':user.user_type
         }
@@ -87,3 +87,4 @@ class BlogSerializer(serializers.ModelSerializer):
  
     def get_total_likes(self, obj):
         return Like.objects.filter(blog=obj, value=1).count()
+

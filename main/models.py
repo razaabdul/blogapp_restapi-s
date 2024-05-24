@@ -26,5 +26,5 @@ class Comment(Base):
 class Like(Base):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name='likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE,)
-    value=models.IntegerField(default=0)
+    value=models.IntegerField(default=0)    
 

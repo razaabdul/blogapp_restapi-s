@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,DjangoModelPermissions,AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import NotFound
 from rest_framework.decorators import permission_classes,action
@@ -93,7 +93,23 @@ class blogview(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self,request,pk):
+        id=pk
+        try :
+            query=Blog.objects.get(uuid=id)
+            query.delete()
+        except Blog.DoesNotExist:
+            return Response ("blog doesen't axist's !")
         
+   
+
+# class BlogViewSet(viewsets.ModelViewSet):
+#     authentication_classes = [JWTAuthentication]
+#     permission_classes=[IsAuthenticated,DjangoModelPermissions]
+#     queryset=Blog.objects.all()
+#     serializer_class=BlogSerializer
+
 class commentview(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes=[JWTAuthentication]
@@ -184,3 +200,22 @@ class userprofile(APIView):
         print(obj.count())
         return Response()
 
+
+
+class LogoutView(APIView):
+    # permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh_token")
+            if not refresh_token:
+                return Response({"error": "Refresh token not provided."}, status=400)
+
+            token = RefreshToken(refresh_token)
+            print('-------',token)
+
+            token.blacklist()
+
+            return Response({"message": "Successfully logged out."}, status=200)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
